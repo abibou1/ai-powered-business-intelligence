@@ -86,10 +86,10 @@ prompt = PromptTemplate(
     template="Analyze this business data: {context}. Question: {input}. Provide insights and recommendations."
 )
 
-chain = LLMChain(llm=llm, prompt=prompt)
+chain = prompt | llm
 
 # Example run
-context = retriever.get_relevant_documents("sales trends")
-response = chain.run(input="Identify key trends", context=context)
+context = retriever.invoke("sales trends")
+response = chain.invoke({"input": "Identify key trends", "context": context})
 print(response)
 
