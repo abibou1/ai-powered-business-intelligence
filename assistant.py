@@ -1,13 +1,9 @@
 # core logic such as data processing, model training, and evaluation
 # import necessary libraries for LangChain RAG
-# from langchain import OpenAI
-# from langchain_community.llms import OpenAI
+
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
-# from langchain.vectorstores import FAISS
 from langchain_community.vectorstores import FAISS
-# from langchain.embeddings import OpenAIEmbeddings
-# from langchain_community.embeddings import OpenAIEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -23,7 +19,7 @@ load_dotenv()
 
 import pandas as pd
 
-# 1. analyse pre-prepared data and extract insights
+# analyse pre-prepared data and extract insights
 df= pd.read_csv('data/sales_data.csv')
 
 # Basic exploration
