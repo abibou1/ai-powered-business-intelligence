@@ -5,6 +5,8 @@ from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
 from langchain.chains import SequentialChain
 from langchain.schema.runnable import RunnablePassthrough
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationalRetrievalChain
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
@@ -104,4 +106,28 @@ overall_chain = (
 )
 result = overall_chain.invoke({"query": "sales patterns"})
 print("Overall Analysis Result:", result)
+
+# implement RAG System
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="stuff",
+    retriever=retriever
+)
+
+response = qa_chain.invoke("What are the key business insights from the sales data?")
+print("RAG Response:", response)
+
+# Integrate memory
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+conv_chain = ConversationalRetrievalChain.from_llm(
+    llm=llm,
+    retriever=retriever,
+    memory=memory
+)
+
+# Example conversation
+response1 = conv_chain.invoke({"question": "Analyze sales trends"})
+print("Conversation 1:", response1)
+response2 = conv_chain.invoke({"question": "Based on that, recommend improvements"})
+print("Conversation 2:", response2)
 
