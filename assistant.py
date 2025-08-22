@@ -4,6 +4,7 @@
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
 from langchain.chains import SequentialChain
+from langchain.evaluation.qa import QAEvalChain
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
@@ -130,4 +131,19 @@ response1 = conv_chain.invoke({"question": "Analyze sales trends"})
 print("Conversation 1:", response1)
 response2 = conv_chain.invoke({"question": "Based on that, recommend improvements"})
 print("Conversation 2:", response2)
+
+# Apply QAEvalChain to check model performance and accuracy
+#from langchain.prompts import PromptTemplate
+eval_chain = QAEvalChain.from_llm(llm)
+
+examples = [
+    {"query": "Total sales?", "answer": str(df['Sales'].sum())},
+    {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
+    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
+    {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
+]
+
+predictions = qa_chain.batch(examples)
+graded = eval_chain.evaluate(examples, predictions)
+print("Evaluation Results:", graded)
 
