@@ -19,6 +19,8 @@ from langchain.chains import LLMChain
 from langchain.tools import Tool
 from langchain_experimental.agents import create_pandas_dataframe_agent
 
+import matplotlib.pyplot as plt
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -146,4 +148,23 @@ examples = [
 predictions = qa_chain.batch(examples)
 graded = eval_chain.evaluate(examples, predictions)
 print("Evaluation Results:", graded)
+
+# Data visualization
+
+# Sales trends over time
+df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
+plt.title('Sales Trends')
+plt.savefig('sales_trends.png')
+
+# Product comparisons (bar)
+df.groupby('Product')['Sales'].sum().plot(kind='bar')
+plt.savefig('product_performance.png')
+
+# Regional (pie)
+df.groupby('Region')['Sales'].sum().plot(kind='pie')
+plt.savefig('regional_analysis.png')
+
+# Customer demographics
+df['Customer_Age'].hist()
+plt.savefig('customer_demographics.png')
 
