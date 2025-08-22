@@ -3,6 +3,8 @@
 
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
+from langchain.chains import SequentialChain
+from langchain.schema.runnable import RunnablePassthrough
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
@@ -57,11 +59,11 @@ llm = OpenAI(temperature=0)
 agent = create_pandas_dataframe_agent(llm, df, verbose=True, allow_dangerous_code=True)
 
 # Example queries
-sales_by_time = agent.run("What is sales performance by month? Group by Date month.")
-product_analysis = agent.run("Top products by sales?")
-regional_analysis = agent.run("Sales by region?")
-customer_seg = agent.run("Segment customers by age or demographics if available.")
-stats = agent.run("Calculate median, std dev of Sales.")
+sales_by_time = agent.invoke("What is sales performance by month? Group by Date month.")
+product_analysis = agent.invoke("Top products by sales?")
+regional_analysis = agent.invoke("Sales by region?")
+customer_seg = agent.invoke("Segment customers by age or demographics if available.")
+stats = agent.invoke("Calculate median, std dev of Sales.")
 
 # Custom Retriever: Tool to extract stats
 def custom_stats_extractor(query):
@@ -88,4 +90,18 @@ chain = prompt | llm
 context = retriever.invoke("sales trends")
 response = chain.invoke({"input": "Identify key trends", "context": context})
 print(response)
+
+# Chain 1: Retrieve
+retrieval_chain = PromptTemplate(template="Retrieve relevant data for: {query}") | llm
+
+# Chain 2: Analyze
+analysis_chain = PromptTemplate(template="Analyze: {data} for trends") | llm
+
+overall_chain = (
+    {"query": RunnablePassthrough()}
+    | retrieval_chain
+    | analysis_chain
+)
+result = overall_chain.invoke({"query": "sales patterns"})
+print("Overall Analysis Result:", result)
 
