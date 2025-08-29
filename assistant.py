@@ -32,6 +32,8 @@ df= pd.read_csv('data/sales_data.csv')
 # Basic exploration
 print(df.head()) # summary stats
 print(df.info()) # Data types
+# print("Print Columns:")
+# print(df.columns.tolist())
 
 # Calculate total sales
 total_sales = df['Sales'].sum()
@@ -138,10 +140,13 @@ print("Conversation 2:", response2)
 #from langchain.prompts import PromptTemplate
 eval_chain = QAEvalChain.from_llm(llm)
 
+
+# df['Date'].dt.month
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
+    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
+    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
 
@@ -167,4 +172,6 @@ plt.savefig('regional_analysis.png')
 # Customer demographics
 df['Customer_Age'].hist()
 plt.savefig('customer_demographics.png')
+
+# __all__ = ["qa_chain", "agent", "memory", "conv_chain"]
 
