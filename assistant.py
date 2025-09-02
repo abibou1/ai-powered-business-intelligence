@@ -146,7 +146,7 @@ examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
     # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
-    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
+    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
 
@@ -159,19 +159,19 @@ print("Evaluation Results:", graded)
 # Sales trends over time
 df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
 plt.title('Sales Trends')
-plt.savefig('sales_trends.png')
+plt.savefig('visualization_img/sales_trends.png')
 
 # Product comparisons (bar)
 df.groupby('Product')['Sales'].sum().plot(kind='bar')
-plt.savefig('product_performance.png')
+plt.savefig('visualization_img/product_performance.png')
 
 # Regional (pie)
 df.groupby('Region')['Sales'].sum().plot(kind='pie')
-plt.savefig('regional_analysis.png')
+plt.savefig('visualization_img/regional_analysis.png')
 
 # Customer demographics
 df['Customer_Age'].hist()
-plt.savefig('customer_demographics.png')
+plt.savefig('visualization_img/customer_demographics.png')
 
 # __all__ = ["qa_chain", "agent", "memory", "conv_chain"]
 
