@@ -21,21 +21,17 @@ from langchain_experimental.agents import create_pandas_dataframe_agent
 
 import matplotlib.pyplot as plt
 
-from dotenv import load_dotenv
-load_dotenv()
 
 import os
-import openai
+from dotenv import load_dotenv
 
-openai.api_key = os.getenv("openai_api_key")  # must match Firebase env name
+load_dotenv() # This loads variables from a .env file into os.environ
 
-def ask_openai(prompt):
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=150
-    )
-    return response.choices[0].text.strip()
+# Access the OpenAI API key from environment variables
+openai_api_key = os.getenv("OPENAI_API_KEY")
+
+if not openai_api_key:
+    raise ValueError("OPENAI_API_KEY environment variable not set.")
 
 import pandas as pd
 
