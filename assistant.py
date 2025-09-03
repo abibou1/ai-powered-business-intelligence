@@ -157,9 +157,9 @@ print("Evaluation Results:", graded)
 # Data visualization
 
 # Sales trends over time
-df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
-plt.title('Sales Trends')
-plt.savefig('visualization_img/sales_trends.png')
+# df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
+# plt.title('Sales Trends')
+# plt.savefig('visualization_img/sales_trends.png')
 
 # Product comparisons (bar)
 df.groupby('Product')['Sales'].sum().plot(kind='bar')

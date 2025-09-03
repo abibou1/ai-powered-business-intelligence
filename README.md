@@ -85,10 +85,8 @@ ai-powered-business-intelligence/
 
 This project uses AI agents capable of executing Python code. Only run in a secure, trusted environment. See [LangChain security guidelines](https://python.langchain.com/docs/security/) for details.
 
-## License
-
-MIT License
-
+### Output Streamlit
+<img src="outputStreamlit.PNG" alt="AI-Powered HR Assistant" width="400" style="display:block; margin:auto;">
 ---
 
 **InsightForge**: Unlock actionable business insights with AI.
