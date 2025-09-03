@@ -1,0 +1,7 @@
+# Example apphosting.yaml
+build:
+  dockerfile: Dockerfile
+run:
+  environmentVariables:
+    - variable: OPENAI_API_KEY
+      secret: OPENAI_API_KEY # This references the secret you set with the CLI
