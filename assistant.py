@@ -24,6 +24,19 @@ import matplotlib.pyplot as plt
 from dotenv import load_dotenv
 load_dotenv()
 
+import os
+import openai
+
+openai.api_key = os.getenv("openai_api_key")  # must match Firebase env name
+
+def ask_openai(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
 import pandas as pd
 
 # analyse pre-prepared data and extract insights
