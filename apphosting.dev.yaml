@@ -3,7 +3,7 @@ runtime: python311
 entrypoint: streamlit run app.py
 
 env_variables:
-  open_api_key: "YOUR_OPENAI_API_KEY"
+  open_api_key: ${OPENAI_API_KEY}
 
 handlers:
   - url: /.*
