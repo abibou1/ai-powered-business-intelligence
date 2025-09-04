@@ -57,7 +57,7 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 	**Docker**
 	```
 	docker build -t test-app .
-	docker run -p 8080:8080 test-app
+	docker run -p 8501:8080 -e OPENAI_API_KEY=your_actual_key_here test-app
 	```
 
 5. **Prepare your data:**
