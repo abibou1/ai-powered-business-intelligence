@@ -42,14 +42,22 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 	.\venv\Scripts\activate
 	```
 
-3. **Install dependencies:**
+3. **Install dependencies:(for linux environment)**
 	```sh
-	pip install -r requirements.txt
+	 pip install -r requirements.txt --no-cache-dir
+	 pip freeze | grep -v "win" > clean-requirements.txt # remove windows specific packages
+	 mv clean-requirements.txt requirements.txt
 	```
 
 4. **Set up your `.env` file:**
 	```
 	OPENAI_API_KEY=your_openai_api_key
+	```
+
+	**Docker**
+	```
+	docker build -t test-app .
+	docker run -p 8080:8080 test-app
 	```
 
 5. **Prepare your data:**
