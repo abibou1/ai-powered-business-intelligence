@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 COPY assistant.py .
 COPY app.py .
+COPY data ./data
+COPY visualization_img ./visualization_img
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
