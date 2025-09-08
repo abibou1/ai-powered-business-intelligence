@@ -44,9 +44,11 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 
 3. **Install dependencies:(for linux environment)**
 	```sh
+	 source ./venv/Scripts/activate
 	 pip install -r requirements.txt --no-cache-dir
 	 pip freeze | grep -v "win" > clean-requirements.txt # remove windows specific packages
 	 mv clean-requirements.txt requirements.txt
+	 pipreqs --force # required packages in requirements.txt
 	```
 
 4. **Set up your `.env` file:**
