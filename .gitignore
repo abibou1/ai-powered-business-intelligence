@@ -30,10 +30,7 @@ Thumbs.db
 # Data files
 *.sqlite3
 *.db
-*.csv
 *.tsv
-*.xls
-*.xlsx
 
 # Node.js (if applicable)
 node_modules/
@@ -75,10 +72,7 @@ Thumbs.db
 # Data files
 *.sqlite3
 *.db
-*.csv
 *.tsv
-*.xls
-*.xlsx
 
 # Node.js (if applicable)
 node_modules/
