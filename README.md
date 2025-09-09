@@ -59,7 +59,7 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 	**Docker**
 	```
 	docker build -t bi-app .
-	docker run --env-file .env -p 8501:8080 bi-app
+	docker run --env-file .env -p 8080:8080 -e PORT=8080 bi-app
 	```
 
 5. **Prepare your data:**
