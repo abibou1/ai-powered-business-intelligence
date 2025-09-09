@@ -154,7 +154,7 @@ eval_chain = QAEvalChain.from_llm(llm)
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
+    #{"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
     # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
@@ -166,9 +166,9 @@ print("Evaluation Results:", graded)
 # Data visualization
 
 # Sales trends over time
-df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
-plt.title('Sales Trends')
-plt.savefig('visualization_img/sales_trends.png')
+# df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
+# plt.title('Sales Trends')
+# plt.savefig('visualization_img/sales_trends.png')
 
 # Product comparisons (bar)
 df.groupby('Product')['Sales'].sum().plot(kind='bar')
