@@ -38,6 +38,22 @@ import pandas as pd
 # analyse pre-prepared data and extract insights
 df= pd.read_csv('data/sales_data.csv')
 
+# Clean up column names (fix spaces or hidden characters)
+df.columns = df.columns.str.strip()
+
+# Ensure 'Date' column exists and is converted properly
+if 'Date' not in df.columns:
+    raise KeyError("The 'Date' column is missing from the CSV. Check your file headers.")
+
+# Convert 'Date' column to datetime
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+
+# Drop rows where Date is invalid
+df.dropna(subset=['Date'], inplace=True)
+
+print("✅ CSV Loaded Successfully")
+print("Columns:", df.columns.tolist())
+
 # Basic exploration
 print(df.head()) # summary stats
 print(df.info()) # Data types
@@ -149,13 +165,13 @@ print("Conversation 2:", response2)
 #from langchain.prompts import PromptTemplate
 eval_chain = QAEvalChain.from_llm(llm)
 
-
-# df['Date'].dt.month
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    #{"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
-    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
+    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
+    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict()
+    )},
+# {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
 
@@ -166,6 +182,13 @@ print("Evaluation Results:", graded)
 # Data visualization
 
 # Sales trends over time
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+df.dropna(subset=['Date'], inplace=True)
+
+df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
+plt.title('Sales Trends')
+plt.savefig('visualization_img/sales_trends.png')
+
 # df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
 # plt.title('Sales Trends')
 # plt.savefig('visualization_img/sales_trends.png')
