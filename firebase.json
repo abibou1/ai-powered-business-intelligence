@@ -1,0 +1,7 @@
+{
+  "hosting": {
+    "appHosting": {
+      "dockerfile": "Dockerfile"
+    }
+  }
+}

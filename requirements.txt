@@ -1,0 +1,12 @@
+faiss-cpu==1.12.0
+python-dotenv==1.1.1
+langchain==0.3.27
+langchain_community==0.3.29
+langchain_experimental==0.3.4
+langchain_openai==0.3.32
+matplotlib==3.10.6
+numpy==2.3.2
+pandas==2.3.1
+python-dotenv==1.1.1
+streamlit==1.48.1
+tabulate==0.9.0
