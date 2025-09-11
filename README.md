@@ -1,11 +1,6 @@
 
 # InsightForge: AI-Powered Business Intelligence Assistant
 
-<p align="center">
-  <img src="images/output/marketingIdea.PNG" alt="Marketing Idea" width="350" style="margin:10px;">
-  <img src="images/output/productByRegion.PNG" alt="Product by Region" width="350" style="margin:10px;">
-</p>
-
 InsightForge is an interactive AI-powered business intelligence tool that leverages advanced language models and retrieval-augmented generation (RAG) to analyze your business data, extract insights, and provide actionable recommendations. The project features a Streamlit-based UI for seamless interaction and visualization.
 
 ## Features
@@ -50,9 +45,6 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 3. **Install dependencies:(for linux environment)**
 	```sh
 	 source ./venv/Scripts/activate
-	 pip install -r requirements.txt --no-cache-dir
-	 pip freeze | grep -v "win" > clean-requirements.txt # remove windows specific packages
-	 mv clean-requirements.txt requirements.txt
 	 pipreqs --force # required packages in requirements.txt
 	```
 
@@ -103,6 +95,11 @@ ai-powered-business-intelligence/
 ├── images/visualization_img/    # Visualization images
 └── README.md             # Project documentation
 ```
+
+<p align="center">
+  <img src="images/output/marketingIdea.PNG" alt="Marketing Idea" width="350" style="margin:10px;">
+  <img src="images/output/productByRegion.PNG" alt="Product by Region" width="350" style="margin:10px;">
+</p>
 
 ## Security Notice
 

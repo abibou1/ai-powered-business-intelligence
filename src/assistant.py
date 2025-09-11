@@ -3,20 +3,20 @@
 
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
-from langchain.chains import SequentialChain
+# from langchain.chains import SequentialChain
 from langchain.evaluation.qa import QAEvalChain
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.document_loaders import CSVLoader
+# from langchain_community.document_loaders import CSVLoader
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain_openai import ChatOpenAI
+#from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+#from langchain.chains import LLMChain
 from langchain.tools import Tool
 from langchain_experimental.agents import create_pandas_dataframe_agent
 
@@ -65,7 +65,7 @@ print("Total Sales by Region:")
 print(total_sales_by_region)
 
 # Convert each row of the pandas DataFrame (df) into a LangChain Document
-# This keeps ALL columns, including 'Date'
+# Keep all columns, including 'Date'
 documents = [
     Document(
         page_content=f"Date: {row['Date']}, Product: {row['Product']}, "
@@ -89,7 +89,6 @@ summary_stats = {
     "Sales by Region": df.groupby('Region')['Sales'].sum().to_dict(),
     "Sales by Product": df.groupby('Product')['Sales'].sum().to_dict()
 }
-
 
 summary_doc = Document(
     page_content="Global Sales Statistics:\n" + "\n".join([f"{k}: {v}" for k, v in summary_stats.items()]),
@@ -189,7 +188,6 @@ response2 = conv_chain.invoke({"question": "Based on that, recommend improvement
 print("Conversation 2:", response2)
 
 # Apply QAEvalChain to check model performance and accuracy
-#from langchain.prompts import PromptTemplate
 eval_chain = QAEvalChain.from_llm(llm)
 
 print("✅ Before Examples");
@@ -198,7 +196,6 @@ print(df.head())
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
     {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
