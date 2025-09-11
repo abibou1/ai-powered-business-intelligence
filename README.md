@@ -96,6 +96,8 @@ ai-powered-business-intelligence/
 └── README.md             # Project documentation
 ```
 
+## Interface
+
 <p align="center">
   <img src="images/output/marketingIdea.PNG" alt="Marketing Idea" width="350" style="margin:10px;">
   <img src="images/output/productByRegion.PNG" alt="Product by Region" width="350" style="margin:10px;">
