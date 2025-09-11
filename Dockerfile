@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-COPY assistant.py .
+COPY src/assistant.py ./src/assistant.py
 COPY app.py .
 COPY data ./data
 COPY visualization_img ./visualization_img

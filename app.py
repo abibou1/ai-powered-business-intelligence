@@ -1,11 +1,14 @@
+
 # Streamlit UI
 import streamlit as st
-from assistant import qa_chain, agent, memory, conv_chain
+import sys
+import os
+from src.assistant import qa_chain, agent, memory, conv_chain
+
 
 st.title("InsightForge: AI Business Intelligence Assistant")
 
 # Chat interface
-
 user_input = st.text_input("Ask me anything about your business data:")
 if user_input:
     response = conv_chain({"question": user_input})['answer'] # Use memory chain
