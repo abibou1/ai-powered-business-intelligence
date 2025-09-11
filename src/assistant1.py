@@ -22,7 +22,6 @@ from langchain_experimental.agents import create_pandas_dataframe_agent
 
 import matplotlib.pyplot as plt
 
-
 import os
 from dotenv import load_dotenv
 
@@ -41,6 +40,10 @@ df= pd.read_csv('data/sales_data.csv')
 
 # Clean up column names (fix spaces or hidden characters)
 df.columns = df.columns.str.strip()
+
+# Ensure 'Date' column exists and is converted properly
+if 'Date' not in df.columns:
+    raise KeyError("The 'Date' column is missing from the CSV. Check your file headers.")
 
 # Convert 'Date' column to datetime
 df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
@@ -64,12 +67,7 @@ total_sales_by_region = df.groupby('Region')['Sales'].sum()
 print("Total Sales by Region:")
 print(total_sales_by_region)
 
-# Load CSV as LangChain documents
-# loader = CSVLoader('data/sales_data.csv')
-# documents = loader.load()
-
 # Convert each row of the pandas DataFrame (df) into a LangChain Document
-# This keeps ALL columns, including 'Date'
 documents = [
     Document(
         page_content=f"Date: {row['Date']}, Product: {row['Product']}, "
@@ -81,28 +79,6 @@ documents = [
     )
     for idx, row in df.iterrows()
 ]
-
-# --- Add summary statistics document ---
-summary_stats = {
-    "Total Sales": df['Sales'].sum(),
-    "Mean Sales": df['Sales'].mean(),
-    "Median Sales": df['Sales'].median(),
-    "Std Dev Sales": df['Sales'].std(),
-    "Min Sales": df['Sales'].min(),
-    "Max Sales": df['Sales'].max(),
-    "Sales by Region": df.groupby('Region')['Sales'].sum().to_dict(),
-    "Sales by Product": df.groupby('Product')['Sales'].sum().to_dict()
-}
-
-
-summary_doc = Document(
-    page_content="Global Sales Statistics:\n" + "\n".join([f"{k}: {v}" for k, v in summary_stats.items()]),
-    metadata={"type": "summary"}
-)
-
-
-# Append the summary statistics document
-documents.append(summary_doc)
 
 # Explore and organize the data
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
@@ -120,13 +96,6 @@ llm = OpenAI(temperature=0)
 
 # Pandas agent for data analysis
 agent = create_pandas_dataframe_agent(llm, df, verbose=True, allow_dangerous_code=True)
-
-# Example queries
-sales_by_time = agent.invoke("What is sales performance by month? Group by Date month.")
-product_analysis = agent.invoke("Top products by sales?")
-regional_analysis = agent.invoke("Sales by region?")
-customer_seg = agent.invoke("Segment customers by age or demographics if available.")
-stats = agent.invoke("Calculate median, std dev of Sales.")
 
 # Custom Retriever: Tool to extract stats
 def custom_stats_extractor(query):
@@ -175,8 +144,27 @@ qa_chain = RetrievalQA.from_chain_type(
     retriever=retriever
 )
 
-response = qa_chain.invoke("What are the key business insights from the sales data?")
-print("RAG Response:", response)
+# --- Query Router ---
+def answer_query(query: str):
+    """
+    Routes queries to the appropriate engine:
+    - Statistical/numeric queries → Pandas agent
+    - Everything else → Retrieval QA chain
+    """
+    stats_keywords = ["mean", "average", "median", "std dev", "standard deviation", 
+                      "variance", "sum", "min", "max", "count", "total"]
+
+    if any(kw in query.lower() for kw in stats_keywords):
+        print("🔢 Routed to Pandas agent")
+        return agent.invoke(query)
+    else:
+        print("📚 Routed to Retrieval QA")
+        return qa_chain.invoke(query)
+
+# --- Example runs using router ---
+print("\n--- Router Examples ---")
+print("Median & Std Dev:", answer_query("Calculate median, std dev of Sales"))
+print("Regional sales:", answer_query("What are the key business insights from the sales data?"))
 
 # Integrate memory
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -202,7 +190,6 @@ print(df.head())
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
     {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
@@ -232,4 +219,3 @@ plt.savefig('images/visualization_img/regional_analysis.png')
 # Customer demographics
 df['Customer_Age'].hist()
 plt.savefig('images/visualization_img/customer_demographics.png')
-
