@@ -8,10 +8,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-COPY assistant.py .
+COPY src/assistant.py ./src/assistant.py
 COPY app.py .
 COPY data ./data
-COPY visualization_img ./visualization_img
+COPY images/visualization_img ./images/visualization_img
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt

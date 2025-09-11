@@ -3,19 +3,20 @@
 
 from langchain_openai import OpenAI
 from langchain.chains import RetrievalQA
-from langchain.chains import SequentialChain
+# from langchain.chains import SequentialChain
 from langchain.evaluation.qa import QAEvalChain
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
-from langchain_community.document_loaders import CSVLoader
+# from langchain_community.document_loaders import CSVLoader
+from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from langchain_openai import ChatOpenAI
+#from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+#from langchain.chains import LLMChain
 from langchain.tools import Tool
 from langchain_experimental.agents import create_pandas_dataframe_agent
 
@@ -25,7 +26,7 @@ import matplotlib.pyplot as plt
 import os
 from dotenv import load_dotenv
 
-load_dotenv() # This loads variables from a .env file into os.environ
+load_dotenv()
 
 # Access the OpenAI API key from environment variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -38,11 +39,21 @@ import pandas as pd
 # analyse pre-prepared data and extract insights
 df= pd.read_csv('data/sales_data.csv')
 
+# Clean up column names (fix spaces or hidden characters)
+df.columns = df.columns.str.strip()
+
+# Convert 'Date' column to datetime
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+
+# Drop rows where Date is invalid
+df.dropna(subset=['Date'], inplace=True)
+
+print("✅ CSV Loaded Successfully")
+print("Columns:", df.columns.tolist())
+
 # Basic exploration
 print(df.head()) # summary stats
 print(df.info()) # Data types
-# print("Print Columns:")
-# print(df.columns.tolist())
 
 # Calculate total sales
 total_sales = df['Sales'].sum()
@@ -53,9 +64,40 @@ total_sales_by_region = df.groupby('Region')['Sales'].sum()
 print("Total Sales by Region:")
 print(total_sales_by_region)
 
-# Load CSV as LangChain documents
-loader = CSVLoader('data/sales_data.csv')
-documents = loader.load()
+# Convert each row of the pandas DataFrame (df) into a LangChain Document
+# Keep all columns, including 'Date'
+documents = [
+    Document(
+        page_content=f"Date: {row['Date']}, Product: {row['Product']}, "
+                     f"Region: {row['Region']}, Sales: {row['Sales']}, "
+                     f"Customer_Age: {row['Customer_Age']}, "
+                     f"Customer_Gender: {row['Customer_Gender']}, "
+                     f"Customer_Satisfaction: {row['Customer_Satisfaction']}",
+        metadata={"row_index": idx}
+    )
+    for idx, row in df.iterrows()
+]
+
+# --- Add summary statistics document ---
+summary_stats = {
+    "Total Sales": df['Sales'].sum(),
+    "Mean Sales": df['Sales'].mean(),
+    "Median Sales": df['Sales'].median(),
+    "Std Dev Sales": df['Sales'].std(),
+    "Min Sales": df['Sales'].min(),
+    "Max Sales": df['Sales'].max(),
+    "Sales by Region": df.groupby('Region')['Sales'].sum().to_dict(),
+    "Sales by Product": df.groupby('Product')['Sales'].sum().to_dict()
+}
+
+summary_doc = Document(
+    page_content="Global Sales Statistics:\n" + "\n".join([f"{k}: {v}" for k, v in summary_stats.items()]),
+    metadata={"type": "summary"}
+)
+
+
+# Append the summary statistics document
+documents.append(summary_doc)
 
 # Explore and organize the data
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
@@ -146,16 +188,15 @@ response2 = conv_chain.invoke({"question": "Based on that, recommend improvement
 print("Conversation 2:", response2)
 
 # Apply QAEvalChain to check model performance and accuracy
-#from langchain.prompts import PromptTemplate
 eval_chain = QAEvalChain.from_llm(llm)
 
+print("✅ Before Examples");
+print(df.head())
 
-# df['Date'].dt.month
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    #{"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
-    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
+    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
 
@@ -166,21 +207,22 @@ print("Evaluation Results:", graded)
 # Data visualization
 
 # Sales trends over time
-# df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
-# plt.title('Sales Trends')
-# plt.savefig('visualization_img/sales_trends.png')
+df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+df.dropna(subset=['Date'], inplace=True)
+
+df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
+plt.title('Sales Trends')
+plt.savefig('images/visualization_img/sales_trends.png')
 
 # Product comparisons (bar)
 df.groupby('Product')['Sales'].sum().plot(kind='bar')
-plt.savefig('visualization_img/product_performance.png')
+plt.savefig('images/visualization_img/product_performance.png')
 
 # Regional (pie)
 df.groupby('Region')['Sales'].sum().plot(kind='pie')
-plt.savefig('visualization_img/regional_analysis.png')
+plt.savefig('images/visualization_img/regional_analysis.png')
 
 # Customer demographics
 df['Customer_Age'].hist()
-plt.savefig('visualization_img/customer_demographics.png')
-
-# __all__ = ["qa_chain", "agent", "memory", "conv_chain"]
+plt.savefig('images/visualization_img/customer_demographics.png')
 

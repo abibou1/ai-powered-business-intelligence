@@ -45,9 +45,6 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 3. **Install dependencies:(for linux environment)**
 	```sh
 	 source ./venv/Scripts/activate
-	 pip install -r requirements.txt --no-cache-dir
-	 pip freeze | grep -v "win" > clean-requirements.txt # remove windows specific packages
-	 mv clean-requirements.txt requirements.txt
 	 pipreqs --force # required packages in requirements.txt
 	```
 
@@ -64,7 +61,7 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 
 5. **Prepare your data:**
 	- Place your business data CSV file in the `data` directory (e.g., `data/sales_data.csv`).
-	- Place visualization images in the `visualization_img` directory.
+	- Place visualization images in the `images/visualization_img` directory.
 
 ### Running the App
 
@@ -78,6 +75,14 @@ streamlit run app.py
 - View data insights and visualizations.
 - Click "Run Data Analysis Agent" for AI-generated recommendations.
 
+## Test
+
+- Sales by region for widget C in the North region?
+- Calculate median, std dev of Sales.
+- Which month had the biggest sales spike, and which product drove it?
+- Which two products generate the highest total revenue?
+- What fun marketing idea could boost sales in the weakest region?
+
 ## File Structure
 
 ```
@@ -87,9 +92,16 @@ ai-powered-business-intelligence/
 ├── assistant.py          # Core logic, data processing, AI agents
 ├── requirements.txt      # Python dependencies
 ├── data/                 # Business data CSV files
-├── visualization_img/    # Visualization images
+├── images/visualization_img/    # Visualization images
 └── README.md             # Project documentation
 ```
+
+## Interface
+
+<p align="center">
+  <img src="images/output/marketingIdea.PNG" alt="Marketing Idea" width="350" style="margin:10px;">
+  <img src="images/output/productByRegion.PNG" alt="Product by Region" width="350" style="margin:10px;">
+</p>
 
 ## Security Notice
 
