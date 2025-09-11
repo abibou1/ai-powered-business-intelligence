@@ -1,6 +1,11 @@
 
 # InsightForge: AI-Powered Business Intelligence Assistant
 
+<p align="center">
+  <img src="images/output/marketingIdea.PNG" alt="Marketing Idea" width="350" style="margin:10px;">
+  <img src="images/output/productByRegion.PNG" alt="Product by Region" width="350" style="margin:10px;">
+</p>
+
 InsightForge is an interactive AI-powered business intelligence tool that leverages advanced language models and retrieval-augmented generation (RAG) to analyze your business data, extract insights, and provide actionable recommendations. The project features a Streamlit-based UI for seamless interaction and visualization.
 
 ## Features
@@ -82,6 +87,9 @@ streamlit run app.py
 
 - Sales by region for widget C in the North region?
 - Calculate median, std dev of Sales.
+- Which month had the biggest sales spike, and which product drove it?
+- Which two products generate the highest total revenue?
+- What fun marketing idea could boost sales in the weakest region?
 
 ## File Structure
 

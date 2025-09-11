@@ -64,10 +64,6 @@ total_sales_by_region = df.groupby('Region')['Sales'].sum()
 print("Total Sales by Region:")
 print(total_sales_by_region)
 
-# Load CSV as LangChain documents
-# loader = CSVLoader('data/sales_data.csv')
-# documents = loader.load()
-
 # Convert each row of the pandas DataFrame (df) into a LangChain Document
 # This keeps ALL columns, including 'Date'
 documents = [
