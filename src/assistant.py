@@ -186,17 +186,17 @@ df.dropna(subset=['Date'], inplace=True)
 
 df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
 plt.title('Sales Trends')
-plt.savefig('visualization_img/sales_trends.png')
+plt.savefig('images/visualization_img/sales_trends.png')
 
 # Product comparisons (bar)
 df.groupby('Product')['Sales'].sum().plot(kind='bar')
-plt.savefig('visualization_img/product_performance.png')
+plt.savefig('images/visualization_img/product_performance.png')
 
 # Regional (pie)
 df.groupby('Region')['Sales'].sum().plot(kind='pie')
-plt.savefig('visualization_img/regional_analysis.png')
+plt.savefig('images/visualization_img/regional_analysis.png')
 
 # Customer demographics
 df['Customer_Age'].hist()
-plt.savefig('visualization_img/customer_demographics.png')
+plt.savefig('images/visualization_img/customer_demographics.png')
 

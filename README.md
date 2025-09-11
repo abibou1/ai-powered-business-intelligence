@@ -64,7 +64,7 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 
 5. **Prepare your data:**
 	- Place your business data CSV file in the `data` directory (e.g., `data/sales_data.csv`).
-	- Place visualization images in the `visualization_img` directory.
+	- Place visualization images in the `images/visualization_img` directory.
 
 ### Running the App
 
@@ -92,7 +92,7 @@ ai-powered-business-intelligence/
 ├── assistant.py          # Core logic, data processing, AI agents
 ├── requirements.txt      # Python dependencies
 ├── data/                 # Business data CSV files
-├── visualization_img/    # Visualization images
+├── images/visualization_img/    # Visualization images
 └── README.md             # Project documentation
 ```
 

@@ -11,7 +11,7 @@ COPY requirements.txt .
 COPY src/assistant.py ./src/assistant.py
 COPY app.py .
 COPY data ./data
-COPY visualization_img ./visualization_img
+COPY images/visualization_img ./images/visualization_img
 
 RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
