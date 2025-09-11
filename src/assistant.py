@@ -11,6 +11,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.document_loaders import CSVLoader
+from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from langchain_openai import ChatOpenAI
@@ -68,8 +69,22 @@ print("Total Sales by Region:")
 print(total_sales_by_region)
 
 # Load CSV as LangChain documents
-loader = CSVLoader('data/sales_data.csv')
-documents = loader.load()
+# loader = CSVLoader('data/sales_data.csv')
+# documents = loader.load()
+
+# Convert each row of the pandas DataFrame (df) into a LangChain Document
+# This keeps ALL columns, including 'Date'
+documents = [
+    Document(
+        page_content=f"Date: {row['Date']}, Product: {row['Product']}, "
+                     f"Region: {row['Region']}, Sales: {row['Sales']}, "
+                     f"Customer_Age: {row['Customer_Age']}, "
+                     f"Customer_Gender: {row['Customer_Gender']}, "
+                     f"Customer_Satisfaction: {row['Customer_Satisfaction']}",
+        metadata={"row_index": idx}
+    )
+    for idx, row in df.iterrows()
+]
 
 # Explore and organize the data
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)

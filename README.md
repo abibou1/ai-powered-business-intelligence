@@ -80,7 +80,7 @@ streamlit run app.py
 
 ## Test
 
-- Sales by region?
+- Sales by region for widget C in the North region?
 - Calculate median, std dev of Sales.
 
 ## File Structure
