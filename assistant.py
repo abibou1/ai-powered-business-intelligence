@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 import os
 from dotenv import load_dotenv
 
-load_dotenv() # This loads variables from a .env file into os.environ
+load_dotenv()
 
 # Access the OpenAI API key from environment variables
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -57,8 +57,6 @@ print("Columns:", df.columns.tolist())
 # Basic exploration
 print(df.head()) # summary stats
 print(df.info()) # Data types
-# print("Print Columns:")
-# print(df.columns.tolist())
 
 # Calculate total sales
 total_sales = df['Sales'].sum()
@@ -165,13 +163,14 @@ print("Conversation 2:", response2)
 #from langchain.prompts import PromptTemplate
 eval_chain = QAEvalChain.from_llm(llm)
 
+print("✅ Before Examples");
+print(df.head())
+
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
     # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().to_dict())},
-    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict()
-    )},
-# {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.month)['Sales'].sum().to_dict())},
+    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
 
@@ -189,10 +188,6 @@ df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
 plt.title('Sales Trends')
 plt.savefig('visualization_img/sales_trends.png')
 
-# df.groupby(df['Date'].dt.month)['Sales'].sum().plot(kind='line')
-# plt.title('Sales Trends')
-# plt.savefig('visualization_img/sales_trends.png')
-
 # Product comparisons (bar)
 df.groupby('Product')['Sales'].sum().plot(kind='bar')
 plt.savefig('visualization_img/product_performance.png')
@@ -204,6 +199,4 @@ plt.savefig('visualization_img/regional_analysis.png')
 # Customer demographics
 df['Customer_Age'].hist()
 plt.savefig('visualization_img/customer_demographics.png')
-
-# __all__ = ["qa_chain", "agent", "memory", "conv_chain"]
 

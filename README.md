@@ -78,6 +78,11 @@ streamlit run app.py
 - View data insights and visualizations.
 - Click "Run Data Analysis Agent" for AI-generated recommendations.
 
+## Test
+
+- Sales by region?
+- Calculate median, std dev of Sales.
+
 ## File Structure
 
 ```
