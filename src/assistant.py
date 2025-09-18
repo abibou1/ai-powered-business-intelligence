@@ -207,11 +207,11 @@ print("Evaluation Results:", graded)
 # Data visualization
 
 # Sales trends over time
-df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-df.dropna(subset=['Date'], inplace=True)
+# df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+# df.dropna(subset=['Date'], inplace=True)
 
-df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
-plt.title('Sales Trends')
+# df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
+# plt.title('Sales Trends')
 plt.savefig('images/visualization_img/sales_trends.png')
 
 # Product comparisons (bar)
