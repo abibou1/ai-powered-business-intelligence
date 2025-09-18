@@ -196,7 +196,7 @@ print(df.head())
 examples = [
     {"query": "Total sales?", "answer": str(df['Sales'].sum())},
     {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-    {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
+    # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
     {"query": "Calculate median, std dev of Sales?", "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}"},
 ]
 
