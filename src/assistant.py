@@ -229,10 +229,49 @@ def generate_visualizations(df: pd.DataFrame):
     plt.savefig('images/visualization_img/customer_demographics.png')
 
 
-def main():
+# Initialize components for app.py to import
+def initialize_components():
+    """Initialize all components needed by app.py"""
+    global qa_chain, agent, memory, conv_chain, df
+    
     # Environment and data
     ensure_openai_env()
     df = load_data()
+    
+    # RAG components
+    documents = build_documents(df)
+    retriever = build_retriever_from_documents(documents)
+    llm = get_llm(temperature=0)
+    
+    # Initialize components
+    qa_chain = build_qa_chain(llm, retriever)
+    agent = build_pandas_agent(llm, df)
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    conv_chain = build_conversational_chain(llm, retriever)
+    
+    return qa_chain, agent, memory, conv_chain, df
+
+
+# Initialize components when module is imported
+try:
+    qa_chain, agent, memory, conv_chain, df = initialize_components()
+except Exception as e:
+    print(f"Warning: Failed to initialize components: {e}")
+    # Set defaults to None to prevent import errors
+    qa_chain = None
+    agent = None
+    memory = None
+    conv_chain = None
+    df = None
+
+
+def main():
+    # Use already initialized components or initialize if needed
+    global qa_chain, agent, memory, conv_chain, df
+    
+    if df is None:
+        qa_chain, agent, memory, conv_chain, df = initialize_components()
+    
     explore_data(df)
 
     # Basic metrics
@@ -241,37 +280,14 @@ def main():
     print("Total Sales by Region:")
     print(metrics['total_sales_by_region'])
 
-    # RAG components
-    documents = build_documents(df)
-    retriever = build_retriever_from_documents(documents)
-    llm = get_llm(temperature=0)
-
     # Agent queries (optional showcase)
-    agent = build_pandas_agent(llm, df)
     try:
         agent_results = run_example_agent_queries(agent)
         print(agent_results)
     except Exception as e:
         print(f"Agent queries failed: {e}")
 
-    # Prompt chain demo
-    prompt_chain = build_prompt_chain(llm)
-    try:
-        prompt_response = run_prompt_chain(prompt_chain, retriever)
-        print(prompt_response)
-    except Exception as e:
-        print(f"Prompt chain failed: {e}")
-
-    # Overall chain demo
-    overall_chain = build_overall_chain(llm)
-    try:
-        result = overall_chain.invoke({"query": "sales patterns"})
-        print("Overall Analysis Result:", result)
-    except Exception as e:
-        print(f"Overall chain failed: {e}")
-
-    # RAG QA chain
-    qa_chain = build_qa_chain(llm, retriever)
+    # RAG QA chain demo
     try:
         response = qa_chain.invoke("What are the key business insights from the sales data?")
         print("RAG Response:", response)
@@ -279,7 +295,6 @@ def main():
         print(f"QA chain failed: {e}")
 
     # Conversational chain demo
-    conv_chain = build_conversational_chain(llm, retriever)
     try:
         response1 = conv_chain.invoke({"question": "Analyze sales trends"})
         print("Conversation 1:", response1)
@@ -290,6 +305,7 @@ def main():
 
     # Evaluation
     try:
+        llm = get_llm(temperature=0)
         graded = evaluate_qa_chain(qa_chain, df, llm)
         print("Evaluation Results:", graded)
     except Exception as e:
