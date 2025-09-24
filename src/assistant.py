@@ -200,15 +200,15 @@ def evaluate_qa_chain(qa_chain, df: pd.DataFrame, llm):
 def generate_visualizations(df: pd.DataFrame):
     # Ensure Date is datetime
     df = df.copy()
-    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
-    df.dropna(subset=['Date'], inplace=True)
+    # df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    # df.dropna(subset=['Date'], inplace=True)
 
     # Sales trends over time
-    plt.figure()
-    df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
-    plt.title('Sales Trends')
-    plt.tight_layout()
-    plt.savefig('images/visualization_img/sales_trends.png')
+    # plt.figure()
+    # df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
+    # plt.title('Sales Trends')
+    # plt.tight_layout()
+    # plt.savefig('images/visualization_img/sales_trends.png')
 
     # Product comparisons (bar)
     plt.figure()
