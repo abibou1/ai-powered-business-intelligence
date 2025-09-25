@@ -8,7 +8,7 @@ from langchain.evaluation.qa import QAEvalChain
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.vectorstores import FAISS
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 # from langchain_community.document_loaders import CSVLoader
 from langchain.schema import Document
@@ -140,7 +140,16 @@ def build_retriever_from_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     docs = text_splitter.split_documents(documents)
     embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(docs, embeddings)
+    persist_directory = os.path.join(".chroma")
+    os.makedirs(persist_directory, exist_ok=True)
+    collection_name = "insightforge-docs"
+    vectorstore = Chroma(
+        collection_name=collection_name,
+        embedding_function=embeddings,
+        persist_directory=persist_directory,
+    )
+    # Add documents to persistent store (upsert behavior)
+    vectorstore.add_documents(docs)
     # Configure retriever to return more documents and include summary documents
     retriever = vectorstore.as_retriever(
         search_type="similarity",

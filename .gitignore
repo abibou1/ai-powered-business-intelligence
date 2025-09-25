@@ -20,6 +20,9 @@ build/
 .vscode/
 *.code-workspace
 
+# Chroma
+.chroma/
+
 # OS files
 .DS_Store
 Thumbs.db
