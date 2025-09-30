@@ -8,7 +8,7 @@ from langchain.evaluation.qa import QAEvalChain
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.vectorstores import FAISS
+from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 # from langchain_community.document_loaders import CSVLoader
 from langchain.schema import Document
@@ -62,7 +62,7 @@ def compute_basic_metrics(df: pd.DataFrame) -> dict:
     return metrics
 
 def build_documents(df: pd.DataFrame) -> list[Document]:
-    # Convert each row of the pandas DataFrame (df) into a LangChain Document
+    # # Convert each row of the pandas DataFrame (df) into a LangChain Document
     documents = [
         Document(
             page_content=(
@@ -77,35 +77,98 @@ def build_documents(df: pd.DataFrame) -> list[Document]:
         for idx, row in df.iterrows()
     ]
 
-    # --- Add summary statistics document ---
-    summary_stats = {
+    # --- Add comprehensive summary statistics documents ---
+    
+    # Basic statistics summary
+    basic_stats = {
         "Total Sales": df['Sales'].sum(),
         "Mean Sales": df['Sales'].mean(),
         "Median Sales": df['Sales'].median(),
-        "Std Dev Sales": df['Sales'].std(),
+        "Standard Deviation Sales": df['Sales'].std(),
         "Min Sales": df['Sales'].min(),
         "Max Sales": df['Sales'].max(),
-        "Sales by Region": df.groupby('Region')['Sales'].sum().to_dict(),
-        "Sales by Product": df.groupby('Product')['Sales'].sum().to_dict(),
+        "Count of Records": len(df),
     }
-
-    summary_doc = Document(
-        page_content="Global Sales Statistics:\n"
-        + "\n".join([f"{k}: {v}" for k, v in summary_stats.items()]),
-        metadata={"type": "summary"},
+    
+    basic_summary_doc = Document(
+        page_content="SALES STATISTICS SUMMARY:\n" + 
+        "\n".join([f"{k}: {v}" for k, v in basic_stats.items()]) +
+        "\n\nThese are the key statistical measures for the sales data.",
+        metadata={"type": "summary", "category": "statistics"},
     )
-
-    documents.append(summary_doc)
+    documents.append(basic_summary_doc)
+    
+    # Regional analysis summary
+    regional_stats = df.groupby('Region')['Sales'].sum().to_dict()
+    regional_summary_doc = Document(
+        page_content="REGIONAL SALES ANALYSIS:\n" +
+        "\n".join([f"{region}: {sales}" for region, sales in regional_stats.items()]) +
+        f"\n\nTotal sales across all regions: {sum(regional_stats.values())}",
+        metadata={"type": "summary", "category": "regional"},
+    )
+    documents.append(regional_summary_doc)
+    
+    # Product analysis summary
+    product_stats = df.groupby('Product')['Sales'].sum().to_dict()
+    product_summary_doc = Document(
+        page_content="PRODUCT SALES ANALYSIS:\n" +
+        "\n".join([f"{product}: {sales}" for product, sales in product_stats.items()]) +
+        f"\n\nTotal sales across all products: {sum(product_stats.values())}",
+        metadata={"type": "summary", "category": "products"},
+    )
+    documents.append(product_summary_doc)
+    
+    # Statistical measures detailed summary
+    stats_detailed_doc = Document(
+        page_content=f"DETAILED STATISTICAL MEASURES:\n"
+        f"Standard Deviation: {df['Sales'].std()}\n"
+        f"Variance: {df['Sales'].var()}\n"
+        f"Mean: {df['Sales'].mean()}\n"
+        f"Median: {df['Sales'].median()}\n"
+        f"Mode: {df['Sales'].mode().iloc[0] if not df['Sales'].mode().empty else 'No mode'}\n"
+        f"Range: {df['Sales'].max() - df['Sales'].min()}\n"
+        f"25th Percentile: {df['Sales'].quantile(0.25)}\n"
+        f"75th Percentile: {df['Sales'].quantile(0.75)}\n"
+        f"Interquartile Range: {df['Sales'].quantile(0.75) - df['Sales'].quantile(0.25)}",
+        metadata={"type": "summary", "category": "detailed_stats"},
+    )
+    documents.append(stats_detailed_doc)
     return documents
 
 
 def build_retriever_from_documents(documents: list[Document]):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     docs = text_splitter.split_documents(documents)
     embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(docs, embeddings)
-    retriever = vectorstore.as_retriever()
+    persist_directory = os.path.join(".chroma")
+    os.makedirs(persist_directory, exist_ok=True)
+    collection_name = "insightforge-docs"
+    vectorstore = Chroma(
+        collection_name=collection_name,
+        embedding_function=embeddings,
+        persist_directory=persist_directory,
+    )
+    # Add documents to persistent store (upsert behavior)
+    vectorstore.add_documents(docs)
+    # Configure retriever to return more documents and include summary documents
+    retriever = vectorstore.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 6}  # Return top 6 most similar documents
+    )
     return retriever
+
+
+def test_retriever(retriever, query: str = "standard deviation"):
+    """Test function to see what documents the retriever finds for a query"""
+    print(f"Testing retriever with query: '{query}'")
+    docs = retriever.invoke(query)
+    print(f"Found {len(docs)} documents:")
+    for i, doc in enumerate(docs):
+        print(f"Document {i+1}:")
+        print(f"  Content preview: {doc.page_content[:200]}...")
+        print(f"  Metadata: {doc.metadata}")
+        print()
+    return docs
 
 def get_llm(temperature: float = 0):
     # Low temp for factual answers
@@ -243,6 +306,11 @@ def initialize_components():
     retriever = build_retriever_from_documents(documents)
     llm = get_llm(temperature=0)
     
+    # Test retriever to see what it finds for statistical queries
+    print("Testing retriever for statistical queries...")
+    test_retriever(retriever, "standard deviation")
+    test_retriever(retriever, "statistics summary")
+    
     # Initialize components
     qa_chain = build_qa_chain(llm, retriever)
     agent = build_pandas_agent(llm, df)
@@ -293,6 +361,19 @@ def main():
         print("RAG Response:", response)
     except Exception as e:
         print(f"QA chain failed: {e}")
+    
+    # Test specific statistical queries
+    try:
+        stats_response = qa_chain.invoke("What is the standard deviation of sales?")
+        print("Standard Deviation Query Response:", stats_response)
+    except Exception as e:
+        print(f"Stats query failed: {e}")
+    
+    try:
+        mean_response = qa_chain.invoke("What is the mean and median of sales?")
+        print("Mean/Median Query Response:", mean_response)
+    except Exception as e:
+        print(f"Mean/Median query failed: {e}")
 
     # Conversational chain demo
     try:

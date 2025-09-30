@@ -17,7 +17,7 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 - LangChain (including langchain-community, langchain-experimental, langchain-openai)
 - OpenAI API
 - Pandas
-- FAISS
+- ChromaDB (persistent vector store via `langchain-chroma`)
 - dotenv
 
 ## Getting Started
@@ -62,6 +62,10 @@ InsightForge is an interactive AI-powered business intelligence tool that levera
 5. **Prepare your data:**
 	- Place your business data CSV file in the `data` directory (e.g., `data/sales_data.csv`).
 	- Place visualization images in the `images/visualization_img` directory.
+
+### Vector Store Persistence
+
+This app uses ChromaDB as the vector database and persists embeddings to the `.chroma` directory at the project root. The collection name is `insightforge-docs`. The store is initialized and upserted on startup; embeddings will be reused across runs.
 
 ### Running the App
 
