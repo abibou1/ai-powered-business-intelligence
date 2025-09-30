@@ -78,61 +78,63 @@ def build_documents(df: pd.DataFrame) -> list[Document]:
     ]
 
     # --- Add comprehensive summary statistics documents ---
-    
-    # Basic statistics summary
-    basic_stats = {
-        "Total Sales": df['Sales'].sum(),
-        "Mean Sales": df['Sales'].mean(),
-        "Median Sales": df['Sales'].median(),
-        "Standard Deviation Sales": df['Sales'].std(),
-        "Min Sales": df['Sales'].min(),
-        "Max Sales": df['Sales'].max(),
-        "Count of Records": len(df),
-    }
-    
-    basic_summary_doc = Document(
-        page_content="SALES STATISTICS SUMMARY:\n" + 
-        "\n".join([f"{k}: {v}" for k, v in basic_stats.items()]) +
-        "\n\nThese are the key statistical measures for the sales data.",
-        metadata={"type": "summary", "category": "statistics"},
-    )
-    documents.append(basic_summary_doc)
-    
-    # Regional analysis summary
-    regional_stats = df.groupby('Region')['Sales'].sum().to_dict()
-    regional_summary_doc = Document(
-        page_content="REGIONAL SALES ANALYSIS:\n" +
-        "\n".join([f"{region}: {sales}" for region, sales in regional_stats.items()]) +
-        f"\n\nTotal sales across all regions: {sum(regional_stats.values())}",
-        metadata={"type": "summary", "category": "regional"},
-    )
-    documents.append(regional_summary_doc)
-    
-    # Product analysis summary
-    product_stats = df.groupby('Product')['Sales'].sum().to_dict()
-    product_summary_doc = Document(
-        page_content="PRODUCT SALES ANALYSIS:\n" +
-        "\n".join([f"{product}: {sales}" for product, sales in product_stats.items()]) +
-        f"\n\nTotal sales across all products: {sum(product_stats.values())}",
-        metadata={"type": "summary", "category": "products"},
-    )
-    documents.append(product_summary_doc)
-    
-    # Statistical measures detailed summary
-    stats_detailed_doc = Document(
-        page_content=f"DETAILED STATISTICAL MEASURES:\n"
-        f"Standard Deviation: {df['Sales'].std()}\n"
-        f"Variance: {df['Sales'].var()}\n"
-        f"Mean: {df['Sales'].mean()}\n"
-        f"Median: {df['Sales'].median()}\n"
-        f"Mode: {df['Sales'].mode().iloc[0] if not df['Sales'].mode().empty else 'No mode'}\n"
-        f"Range: {df['Sales'].max() - df['Sales'].min()}\n"
-        f"25th Percentile: {df['Sales'].quantile(0.25)}\n"
-        f"75th Percentile: {df['Sales'].quantile(0.75)}\n"
-        f"Interquartile Range: {df['Sales'].quantile(0.75) - df['Sales'].quantile(0.25)}",
-        metadata={"type": "summary", "category": "detailed_stats"},
-    )
-    documents.append(stats_detailed_doc)
+    # The following summary documents are intentionally disabled to ensure
+    # only raw row-level data is fed into the LLM.
+    #
+    # # Basic statistics summary
+    # basic_stats = {
+    #     "Total Sales": df['Sales'].sum(),
+    #     "Mean Sales": df['Sales'].mean(),
+    #     "Median Sales": df['Sales'].median(),
+    #     "Standard Deviation Sales": df['Sales'].std(),
+    #     "Min Sales": df['Sales'].min(),
+    #     "Max Sales": df['Sales'].max(),
+    #     "Count of Records": len(df),
+    # }
+    # 
+    # basic_summary_doc = Document(
+    #     page_content="SALES STATISTICS SUMMARY:\n" + 
+    #     "\n".join([f"{k}: {v}" for k, v in basic_stats.items()]) +
+    #     "\n\nThese are the key statistical measures for the sales data.",
+    #     metadata={"type": "summary", "category": "statistics"},
+    # )
+    # documents.append(basic_summary_doc)
+    # 
+    # # Regional analysis summary
+    # regional_stats = df.groupby('Region')['Sales'].sum().to_dict()
+    # regional_summary_doc = Document(
+    #     page_content="REGIONAL SALES ANALYSIS:\n" +
+    #     "\n".join([f"{region}: {sales}" for region, sales in regional_stats.items()]) +
+    #     f"\n\nTotal sales across all regions: {sum(regional_stats.values())}",
+    #     metadata={"type": "summary", "category": "regional"},
+    # )
+    # documents.append(regional_summary_doc)
+    # 
+    # # Product analysis summary
+    # product_stats = df.groupby('Product')['Sales'].sum().to_dict()
+    # product_summary_doc = Document(
+    #     page_content="PRODUCT SALES ANALYSIS:\n" +
+    #     "\n".join([f"{product}: {sales}" for product, sales in product_stats.items()]) +
+    #     f"\n\nTotal sales across all products: {sum(product_stats.values())}",
+    #     metadata={"type": "summary", "category": "products"},
+    # )
+    # documents.append(product_summary_doc)
+    # 
+    # # Statistical measures detailed summary
+    # stats_detailed_doc = Document(
+    #     page_content=f"DETAILED STATISTICAL MEASURES:\n"
+    #     f"Standard Deviation: {df['Sales'].std()}\n"
+    #     f"Variance: {df['Sales'].var()}\n"
+    #     f"Mean: {df['Sales'].mean()}\n"
+    #     f"Median: {df['Sales'].median()}\n"
+    #     f"Mode: {df['Sales'].mode().iloc[0] if not df['Sales'].mode().empty else 'No mode'}\n"
+    #     f"Range: {df['Sales'].max() - df['Sales'].min()}\n"
+    #     f"25th Percentile: {df['Sales'].quantile(0.25)}\n"
+    #     f"75th Percentile: {df['Sales'].quantile(0.75)}\n"
+    #     f"Interquartile Range: {df['Sales'].quantile(0.75) - df['Sales'].quantile(0.25)}",
+    #     metadata={"type": "summary", "category": "detailed_stats"},
+    # )
+    # documents.append(stats_detailed_doc)
     return documents
 
 
@@ -249,7 +251,7 @@ def evaluate_qa_chain(qa_chain, df: pd.DataFrame, llm):
     examples = [
         {"query": "Total sales?", "answer": str(df['Sales'].sum())},
         {"query": "Sales by region?", "answer": str(df.groupby('Region')['Sales'].sum().to_dict())},
-        # {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
+        {"query": "Sales performance by month?", "answer": str(df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().sort_index().to_dict())},
         {
             "query": "Calculate median, std dev of Sales?",
             "answer": f"Median: {df['Sales'].median()}, Std Dev: {df['Sales'].std()}",
@@ -267,11 +269,11 @@ def generate_visualizations(df: pd.DataFrame):
     # df.dropna(subset=['Date'], inplace=True)
 
     # Sales trends over time
-    # plt.figure()
-    # df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
-    # plt.title('Sales Trends')
-    # plt.tight_layout()
-    # plt.savefig('images/visualization_img/sales_trends.png')
+    plt.figure()
+    df.groupby(df['Date'].dt.to_period('M'))['Sales'].sum().plot(kind='line')
+    plt.title('Sales Trends')
+    plt.tight_layout()
+    plt.savefig('images/visualization_img/sales_trends.png')
 
     # Product comparisons (bar)
     plt.figure()
