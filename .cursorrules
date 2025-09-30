@@ -1,0 +1,81 @@
+## Cursor Rules for ai-powered-business-intelligence
+
+### Goals
+- Build a reliable, readable Python codebase for AI-driven BI and visualization.
+- Keep the app production-friendly, data-safe, and fast to iterate on.
+- Prefer clarity and maintainability over cleverness.
+
+### Tech and Structure
+- Language: Python 3.11
+- Entrypoint: `app.py`; core logic in `src/assistant.py`
+- Data: CSVs under `data/` (e.g., `data/sales_data.csv`)
+- Images/outputs: `images/`
+
+### Coding Style
+- Use type hints for public functions and non-trivial helpers.
+- Prefer early returns, shallow nesting, and explicit error handling.
+- Name clearly (no cryptic abbreviations). Variables are nouns; functions are verbs.
+- Keep functions small and cohesive; extract helpers when doing more than one thing.
+- Add short docstrings (explain “why”, not “how”).
+- Avoid inline comments unless essential. No TODO comments—implement or open an issue.
+
+### Data & Robustness
+- Validate inputs from `data/`; handle missing/optional columns gracefully.
+- Maintain guards in `src/assistant.py` for absent columns (e.g., `Date`); skip plots/fields when missing.
+- Do not hard-fail on non-critical visualization errors; log and continue.
+- Avoid loading entire datasets if not needed; use chunking/streaming when practical.
+
+### Visualizations
+- Save charts to `images/output/` or `images/visualization_img/`.
+- Use clear titles, axis labels, and legends.
+- If required columns are missing, skip the chart and log the reason.
+
+### Error Handling & Logging
+- Fail fast for programmer errors; degrade gracefully for data/user errors.
+- Provide actionable messages with context (file/column/shape).
+- Use consistent logging levels; avoid noisy debug logs in production paths.
+
+### Linting & Formatting
+- Use `ruff` for linting and `black` for formatting if configured.
+- Introduce no new linter errors; refactor to avoid.
+
+### Dependencies
+- Add libs to `requirements.txt` with pinned versions.
+- Remove unused dependencies promptly.
+
+### Performance & Memory
+- Avoid O(n^2) work and repeated full-scans over large CSVs; pre-aggregate when possible.
+- Cache intermediate results if reused.
+
+### Security & Privacy
+- Never commit secrets, tokens, or PII. Use environment variables.
+- Treat all input data as untrusted; validate and sanitize before use.
+
+### Git & PRs
+- Prefer Conventional Commits (e.g., `feat:`, `fix:`, `refactor:`) where reasonable.
+- Keep commits small and focused; explain the “why”.
+- PRs should summarize impact, risks, and any data schema expectations.
+
+### Cursor Assistant Guidance
+- When editing code:
+  - Preserve existing indentation and file formatting.
+  - Add necessary imports; keep `requirements.txt` accurate.
+  - Keep edits minimal and scoped; do not reformat unrelated code.
+  - Maintain guards for optional columns/fields.
+- When creating new files:
+  - Put data-processing helpers in `src/`.
+  - Store output assets under `images/`.
+- When uncertain:
+  - Read `README.md` and relevant source files first.
+  - Propose options with trade-offs; implement the simplest that fits.
+
+### Testing & Verification (lightweight)
+- For non-trivial changes, include a quick sanity check (small sample run, log assertions).
+
+### Documentation
+- Update `README.md` when behavior or setup changes.
+- Document expected input columns and optional fields for key functions.
+
+### Non-Goals
+- Do not introduce heavy frameworks unless clearly required.
+- Do not over-optimize prematurely; prioritize robust, correct behavior first.
