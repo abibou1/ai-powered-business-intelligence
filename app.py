@@ -24,10 +24,10 @@ if user_input:
 
 # Visualization interface
 st.subheader("Data Insights")
-# st.image("images/visualization_img/sales_trends.png", caption="Sales Trends Over Time")
+st.image("images/visualization_img/sales_trends.png", caption="Sales Trends Over Time")
 st.image("images/visualization_img/customer_demographics.png", caption="Customer Demographics")
 st.image("images/visualization_img/product_performance.png", caption="Product Performance")
-# st.image("images/visualization_img/regional_analysis.png", caption="Regional Analysis")
+st.image("images/visualization_img/regional_analysis.png", caption="Regional Analysis")
 
 # Run agent for analysis
 if st.button("Run Data Analysis Agent"):
