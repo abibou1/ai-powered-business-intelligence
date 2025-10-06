@@ -73,15 +73,22 @@ This app uses ChromaDB as the vector database and persists embeddings to the `.c
 streamlit run app.py
 ```
 
+### Running the tests
+```sh
+pytest -q
+```
+
 ## Usage
 
 - Enter business-related questions in the chat interface.
 - View data insights and visualizations.
 - Click "Run Data Analysis Agent" for AI-generated recommendations.
 
-## Test
+## Input
 
 - Sales by region for widget C in the North region?
+- Group Sales by Month and sum.
+- Compute monthly sales using the Month column.
 - Calculate median, std dev of Sales.
 - Which month had the biggest sales spike, and which product drove it?
 - Which two products generate the highest total revenue?
