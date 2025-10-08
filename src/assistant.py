@@ -172,7 +172,7 @@ def test_retriever(retriever, query: str = "standard deviation"):
         print()
     return docs
 
-def get_llm(temperature: float = 0, model: str = "gpt-3.5-turbo"):
+def get_llm(temperature: float = 0, model: str = "gpt-4o-mini"):
     # Low temp for factual answers
     return OpenAI(temperature=temperature, model=model)
 
